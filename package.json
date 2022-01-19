@@ -1,14 +1,33 @@
 {
   "name": "hac-tutorial",
-  "version": "0.0.0",
+  "version": "0.0.1",
+  "description": "Use case example of the Hive Authentication Client (HAC) password less users authentication",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build --configuration=production --base-href=/",
+    "build-stat": "ng build --configuration=production --base-href=/ --stats-json",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng serve --port 8000 --host 0.0.0.0 --liveReload=true  --disable-host-check"
   },
-  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mintrawa/hac-tutorial.git"
+  },
+  "keywords": [
+    "hive",
+    "hive blockchain",
+    "authentication",
+    "Hive Authentication Services",
+    "Hive Keychain Browser Extension",
+    "Hive Authentication Client"
+  ],
+  "author": "@mintrawa (https://hive.blog/@mintrawa)",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/Mintrawa/hac-tutorial/issues"
+  },
+  "homepage": "https://github.com/Mintrawa/hac-tutorial#readme",
   "dependencies": {
     "@angular/animations": "~13.1.0",
     "@angular/common": "~13.1.0",
@@ -18,6 +37,8 @@
     "@angular/platform-browser": "~13.1.0",
     "@angular/platform-browser-dynamic": "~13.1.0",
     "@angular/router": "~13.1.0",
+    "@mintrawa/hive-auth-client": "^0.0.4",
+    "ng-qrcode": "^6.0.0",
     "rxjs": "~7.4.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"

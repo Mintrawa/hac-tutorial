@@ -1,0 +1,36 @@
+<div class="flex-container">
+
+  <!-- SIGN IN -->
+  <div class="encart" *ngIf="!connected && !qrHAS">
+    <div>HIVE Username</div>
+    <div style="height:6px;"></div>
+    <input #username type="text" />
+    <div style="height:6px;"></div>
+    <div *ngIf="!loader">
+      <button (click)="connect(username.value, 'HAS')"> HAS Connect</button>&nbsp;
+      <button (click)="connect(username.value, 'KBE')"> KBE Connect</button>
+    </div>
+    <div *ngIf="loader" class="loader"></div>
+  </div>
+  
+  <!-- QR Code -->
+  <div class="encart" *ngIf="!connected && qrHAS">
+    <div>{{ username }}</div>
+    <qr-code
+      [value]="'has://auth_req/' + qrHAS"
+      [size]="192"
+      [errorCorrectionLevel]="'M'"
+    ></qr-code>
+    <div *ngIf="loader" class="loader"></div>
+  </div>
+
+  <!-- Routing -->
+  <div class="encart" *ngIf="connected">
+    <div><strong>{{ username }}</strong></div>
+    <div style="height:6px;"></div>
+    <div>Connected: {{ connected }}</div>
+    <div style="height:6px;"></div>
+    <button [routerLink]="['/operations']">>> OPERATIONS PAGE <<</button >
+  </div>
+
+</div>

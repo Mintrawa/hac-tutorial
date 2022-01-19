@@ -1,27 +1,54 @@
 # HacTutorial
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.1.3.
+Use case example of the Hive Authentication Client (HAC) password less users authentication, sign and broadcast transactions for the [HIVE Blockchain](https://hive.io/) through the [Hive Authentication Services (HAS)](https://hive.blog/hive-139531/@arcange/hive-authentication-services-proposal) or the [Hive Keychain Browser Extension (KBE)](https://hive.blog/hive/@keychain/hive-keychain-proposal-3-dhf).
 
-## Development server
+## Getting Started
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+### Installation From the source:
 
-## Code scaffolding
+clone the repository
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+```bash
+$  git clone https://github.com/Mintrawa/hac-tutorial.git
+```
 
-## Build
+then
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+```bash
+$  cd hac-tutorial
+~/hac-tutorial$  npm install
+```
 
-## Running unit tests
+### Run it
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Test
 
-## Running end-to-end tests
+```bash
+$  npm test
+```
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+Build
 
-## Further help
+```bash
+$  npm run build
+```
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+Build with stats.json
+
+```bash
+$  npm run build-stat
+```
+
+then run the [webpack-bundle-analyzer](https://www.npmjs.com/package/webpack-bundle-analyzer)
+
+## Contributing
+
+Pull requests for new features, bug fixes, and suggestions are welcome!
+
+## License
+
+Copyright (C) 2021  @mintrawa (https://hive.blog/@mintrawa)
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.

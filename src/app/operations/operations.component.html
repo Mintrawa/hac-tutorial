@@ -1,0 +1,165 @@
+<div class="flex-container">
+
+  <!-- USERNAME -->
+  <div class="encart item">
+    <div>HIVE Username</div>
+    <div style="height:6px;"></div>
+    <div><strong>{{ username }}</strong></div>
+    <div style="height: 12px;"></div>
+    <div *ngIf="trx">
+      resultat => {{ trx }}
+    </div>
+  </div>
+
+  <div style="height: 20px;"></div>
+
+  <!-- CLAIM ACCOUNT -->
+  <div class="encart item">
+    <div><strong>CLAIM ACCOUNT</strong></div>
+    <div style="height:6px;"></div>
+    <button *ngIf="opeLoader !== 'manualTransaction'" [disabled]="opeLoader !== 'none'" (click)="manualTransaction()">CLAIM ACCOUNT (manual transaction)</button>
+    <div *ngIf="opeLoader === 'manualTransaction'" class="loader"></div>
+  </div>
+
+  <div style="height: 20px;"></div>
+
+  <!-- FOLLOWING -->
+  <div class="encart item">
+    <div><strong>FOLLOWING</strong></div>
+    <div style="height:6px;"></div>
+    <div><input #following type="text"></div>
+    <div style="height:6px;"></div>
+    <div *ngIf="opeLoader !== 'follow'">
+      <button  [disabled]="opeLoader !== 'none'" (click)="follow(following.value, true)">FOLLOW</button>&nbsp;
+      <button  [disabled]="opeLoader !== 'none'" (click)="follow(following.value, false)">UNFOLLOW</button>
+    </div>
+    <div *ngIf="opeLoader === 'follow'" class="loader"></div>
+  </div>
+
+  <div style="height: 20px;"></div>
+
+  <!-- VOTE -->
+  <div class="encart item">
+    <div><strong>VOTE</strong></div>
+    <div style="height:6px;"></div>
+    <div>
+      <div>author: <input #author type="text" value="mintrawa"></div>
+      <div style="height:6px;"></div>
+      <div>permlink: <input #permlink type="text" value="hive-nodes-checker-version-0-hive-139531"></div>
+      <div style="height:6px;"></div>
+      <div>percent: <input style="width: 75px;" #weight type="number" min="-100" max="100" value=10></div>
+    </div>
+    <div style="height:6px;"></div>
+    <div *ngIf="opeLoader !== 'vote'">
+      <button  [disabled]="opeLoader !== 'none'" (click)="vote(author.value, permlink.value, weight.value, false)">VOTE</button>&nbsp;
+      <button  [disabled]="opeLoader !== 'none'" (click)="vote(author.value, permlink.value, weight.value, true)">DONVOTE</button>
+    </div>
+    <div *ngIf="opeLoader === 'vote'" class="loader"></div>
+  </div>
+
+  <div style="height: 20px;"></div>
+
+  <!-- VOTE WITNESS -->
+  <div class="encart item">
+    <div><strong>VOTE WITNESS</strong></div>
+    <div style="height:6px;"></div>
+    <div>witness: <input #witness type="text" value="mintrawa"></div>
+    <div style="height:6px;"></div>
+    <div *ngIf="opeLoader !== 'voteWitness'">
+      <button  [disabled]="opeLoader !== 'none'" (click)="voteWitness(witness.value, true)">APPROVE</button>&nbsp;
+      <button  [disabled]="opeLoader !== 'none'" (click)="voteWitness(witness.value, false)">DISAPPROVE</button>
+    </div>
+    <div *ngIf="opeLoader === 'voteWitness'" class="loader"></div>
+  </div>
+
+  <div style="height: 20px;"></div>
+
+  <!-- TRANSFER -->
+  <div class="encart item">
+    <div><strong>TRANSFER</strong></div>
+    <div style="height:6px;"></div>
+    <div>
+      <div>to: <input #to type="text" [value]="username"></div>
+      <div style="height:6px;"></div>
+      <div>amount: <input style="width: 75px;" #amountTransfer type="number" value="0.001">&nbsp;<select #currencyTransfer value="HIVE"><option value="HIVE" selected>HIVE</option><option value="HBD">HBD</option></select></div>
+      <div style="height:6px;"></div>
+      <div>memo: <input #memo type="text" value="Test of the HAC"></div>
+    </div>
+    <div style="height:6px;"></div>
+    <div *ngIf="opeLoader !== 'transfer'">
+      <button  [disabled]="opeLoader !== 'none'" (click)="transfer(to.value, amountTransfer.value, currencyTransfer.value, memo.value)">TRANSFER</button>
+    </div>
+    <div *ngIf="opeLoader === 'transfer'" class="loader"></div>
+  </div>
+
+  <div style="height: 20px;"></div>
+
+  <!-- TRANSFER TO VESTING -->
+  <div class="encart item">
+    <div><strong>POWER UP</strong></div>
+    <div style="height:6px;"></div>
+    <div>
+      <div>to: <input #powerTo type="text" [value]="username"></div>
+      <div style="height:6px;"></div>
+      <div>amount: <input style="width: 75px;" #powerValue type="number" value="10.000"> HIVE</div>
+    </div>
+    <div style="height:6px;"></div>
+    <div *ngIf="opeLoader !== 'transferToVesting'">
+      <button  [disabled]="opeLoader !== 'none'" (click)="transferToVesting(powerTo.value, powerValue.value)">POWER UP</button>
+    </div>
+    <div *ngIf="opeLoader === 'transferToVesting'" class="loader"></div>
+  </div>
+
+  <div style="height: 20px;"></div>
+
+  <!-- WITHDRAW VESTING -->
+  <div class="encart item">
+    <div><strong>POWER DOWN</strong></div>
+    <div style="height:6px;"></div>
+    <div>
+      <div>amount: <input style="width: 75px;" #powerdownValue type="number" value="10.000"> HIVE</div>
+    </div>
+    <div style="height:6px;"></div>
+    <div *ngIf="opeLoader !== 'withdrawVesting'">
+      <button  [disabled]="opeLoader !== 'none'" (click)="withdrawVesting(powerdownValue.value)">POWER DOWN</button>
+    </div>
+    <div *ngIf="opeLoader === 'withdrawVesting'" class="loader"></div>
+  </div>
+
+  <div style="height: 20px;"></div>
+
+  <!-- CONVERT -->
+  <div class="encart item">
+    <div><strong>CONVERT</strong></div>
+    <div style="height:6px;"></div>
+    <div>
+      <div>amount: <input style="width: 75px;" #amountConvert type="number" value="1.000">&nbsp;<select #currencyConvert value="HIVE"><option value="HIVE" selected>HIVE</option><option value="HBD">HBD</option></select></div>
+    </div>
+    <div style="height:6px;"></div>
+    <div *ngIf="opeLoader !== 'convert'">
+      <button  [disabled]="opeLoader !== 'none'" (click)="convert(amountConvert.value, currencyConvert.value)">CONVERT</button>
+    </div>
+    <div *ngIf="opeLoader === 'convert'" class="loader"></div>
+  </div>
+
+  <div style="height: 20px;"></div>
+
+  <!-- DELEGATION -->
+  <div class="encart item">
+    <div><strong>DELEGATION</strong></div>
+    <div style="height:6px;"></div>
+    <div>
+      <div>recipient: <input #delegatee type="text" value="mintrawa"></div>
+      <div style="height:6px;"></div>
+      <div>delegate: <input style="width: 75px;" #delegate type="number"> HP</div>
+    </div>
+    <div style="height:6px;"></div>
+    <div *ngIf="opeLoader !== 'delegation'">
+      <button  [disabled]="opeLoader !== 'none'" (click)="delegation(delegatee.value, delegate.value)">DELEGATE</button>
+    </div>
+    <div *ngIf="opeLoader === 'delegation'" class="loader"></div>
+  </div>
+
+  <div style="height: 20px;"></div>
+
+</div>
