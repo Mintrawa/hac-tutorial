@@ -83,6 +83,7 @@ export class OperationsComponent implements OnInit, OnDestroy {
         this.username = result[0].account;
         this.appService.emitUserLogin(this.username);
       } else {
+        localStorage.removeItem("current")
         this.username = undefined;
         this.appService.emitUserLogin(this.username);
         this.router.navigate(['/']);
