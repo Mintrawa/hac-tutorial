@@ -80,6 +80,7 @@ export class OperationsComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe((result: ReturnType <typeof hacGetAccounts>|undefined) => {
       if(result) {
+        localStorage.setItem("current", result[0].account)
         this.username = result[0].account;
         this.appService.emitUserLogin(this.username);
       } else {
