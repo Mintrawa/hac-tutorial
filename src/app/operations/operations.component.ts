@@ -82,6 +82,10 @@ export class OperationsComponent implements OnInit, OnDestroy {
       if(result) {
         this.username = result[0].account;
         this.appService.emitUserLogin(this.username);
+      } else {
+        this.username = undefined;
+        this.appService.emitUserLogin(this.username);
+        this.router.navigate(['/']);
       }
     });
   }
