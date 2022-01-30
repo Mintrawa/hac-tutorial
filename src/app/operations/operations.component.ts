@@ -1,4 +1,5 @@
-import { Component, OnDestroy, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectorRef, NgZone, Inject } from '@angular/core';
+import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 
 /** Router */
 import { Router } from "@angular/router";
@@ -13,16 +14,46 @@ import {
   hacTransfer, hacTransferToVesting, hacWithdrawVesting, hacDelegation, hacConvert
 } from '@mintrawa/hive-auth-client';
 
+export interface DialogData {
+  username?: string;
+  users: ReturnType <typeof hacGetAccounts>;
+}
+
+import { AppService } from '../app.service';
+import { Subscription } from 'rxjs';
+
+@Component({
+  selector: 'operation-dialog',
+  templateUrl: 'operation-dialog.component.html',
+  styleUrls: ['./operations.component.scss']
+})
+export class DialogOperationsDialog {
+  constructor(
+    public dialogRef: MatDialogRef<DialogOperationsDialog>,
+    @Inject(MAT_DIALOG_DATA) public data: DialogData,
+  ) {}
+
+  switch(account: ReturnType <typeof hacGetAccounts>): void {
+    this.dialogRef.close(account);
+  }
+
+  onNoClick(): void {
+    this.dialogRef.close();
+  }
+}
+
 @Component({
   templateUrl: './operations.component.html',
-  styleUrls: ['./operations.component.scss'],
-  // changeDetection: ChangeDetectionStrategy.OnPush // add this
+  styleUrls: ['./operations.component.scss']
 })
-export class OperationsComponent implements OnInit {
-  trx?: any
+export class OperationsComponent implements OnInit, OnDestroy {
+  /** User */
+  userSubscription?: Subscription;
   username?: string
-  hacAccount!: ReturnType<typeof hacGetAccounts>;
-  pwd = '520c5c9b-bd58-4253-850a-1fa591a2dabd';
+
+  hacSubscription?: any;
+
+  trx?: any
 
   total_vesting_fund_hive:number = 0
   total_vesting_shares:number = 0
@@ -30,10 +61,30 @@ export class OperationsComponent implements OnInit {
   opeLoader: string = "none"
 
   constructor(
-    private router: Router,
+    private appService: AppService,
+    public dialog: MatDialog,
+
     private http: HttpClient,
-    private ref: ChangeDetectorRef
+    private ref: ChangeDetectorRef,
+    private router: Router,
+    private zone: NgZone
   ) {}
+
+  openDialog(): void {
+    const data: DialogData = {
+      username: this.username,
+      users: hacGetAccounts()
+    }
+
+    const dialogRef = this.dialog.open(DialogOperationsDialog, { width: '250px', data });
+
+    dialogRef.afterClosed().subscribe((result: ReturnType <typeof hacGetAccounts>|undefined) => {
+      if(result) {
+        this.username = result[0].account;
+        this.appService.emitUserLogin(this.username);
+      }
+    });
+  }
 
   convertPOWERtoVEST(POWER: number): string {
     /** Value Per MVESTS */
@@ -102,18 +153,32 @@ export class OperationsComponent implements OnInit {
     hacDelegation(delegatee, VESTS+' VESTS')
   }
 
-  ngOnInit(): void {
-    /** Previous */
-    const username = localStorage.getItem("username")
-    if(!username) this.router.navigate(['/sign'])
-    if(username) this.username = username
+  logout(u: string): void {
+    this.appService.emitUserLogout(u);
 
-    if(username && this.pwd) this.hacAccount = hacGetAccounts(username, this.pwd)
-    if(this.hacAccount && this.hacAccount[0]) {
-      console.log('%cHAC Account', 'color: goldenrod', this.hacAccount[0].account)
+    /** Navigate to operations page (use ngZone because of Keychain) */
+    this.zone.run(()=> {
+      this.router.navigate(['/']);
+    });
+  }
+
+  ngOnInit(): void {
+    if(!this.appService.username) {
+      const current = localStorage.getItem("current");
+      if(current) {
+        this.username = current;
+        this.appService.emitUserLogin(current);
+      } else {
+        this.router.navigate(['/']);
+      }
     }
 
-    hacMsg.subscribe(m => {
+    this.userSubscription = this.appService.userSubject.subscribe(user => { 
+      this.username = user; 
+      console.log("userSubject", user);
+    });
+
+    this.hacSubscription = hacMsg.subscribe(m => {
       /** HAC => Received sign_wait */
       if(m.type === "sign_wait") {
         console.log('%cReceived sign_wait =>', 'color: goldenrod', m.msg? m.msg.uuid : null)
@@ -143,11 +208,12 @@ export class OperationsComponent implements OnInit {
 
     setTimeout(() => {
       console.log('%cHAS Status', 'color: goldenrod', hasGetConnectionStatus())
-    }, 2000);
+    }, 3000);
   }
 
   ngOnDestroy(): void { 
-    // hacMsg.unsubscribe(); 
+    if(this.hacSubscription) this.hacSubscription.unsubscribe();
+    if(this.userSubscription) this.userSubscription.unsubscribe();
   }
 
 }

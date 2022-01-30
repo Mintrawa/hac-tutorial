@@ -1,0 +1,14 @@
+<h1 mat-dialog-title>Hi {{data.username}}</h1>
+<div mat-dialog-content>
+  <p>What account you want to use</p>
+  <div class="switch-line" *ngFor="let item of data.users">
+    <div style="padding-right: 12px;">
+      <img [src]="'https://images.hive.blog/u/'+ item.account +'/avatar'" [alt]="item.account" (click)="switch([item])" class="switch-profile-pic pointer" style="vertical-align: middle;" />
+    </div>
+    <div class="pointer" (click)="switch([item])">{{ item.account }} <span style="font-size: small;" *ngIf="item.hkc">&nbsp;<img src="https://toolbox.mintrawa.com/assets/images/logo-Hive-KeyChain-Extension.png" alt="Hive-keychain" class="hkc"></span></div>
+  </div>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">No Thanks</button>
+  <button mat-button [mat-dialog-close]="data.username" cdkFocusInitial>Ok</button>
+</div>

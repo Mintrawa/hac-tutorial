@@ -1,10 +1,12 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
 
 /** Router */
 import { Router } from "@angular/router"
 
 /** HIVE auth client */
-import { hacMsg, hacUserAuth, hasGetConnectionStatus, hacGetAccounts } from '@mintrawa/hive-auth-client';
+import { hacMsg, hacUserAuth } from '@mintrawa/hive-auth-client';
+
+import { AppService } from '../app.service';
 
 @Component({
   selector: 'app-signin',
@@ -12,41 +14,41 @@ import { hacMsg, hacUserAuth, hasGetConnectionStatus, hacGetAccounts } from '@mi
   styleUrls: ['./signin.component.scss']
 })
 export class SigninComponent implements OnInit, OnDestroy {
+  username = localStorage.getItem('current');
+
+  hacSubscription?: any;
+
   loader = false;
   qrHAS: string | undefined;
-  username?: string;
-  connected?: string;
-  hacAccount!: ReturnType<typeof hacGetAccounts>;
-  pwd = '520c5c9b-bd58-4253-850a-1fa591a2dabd';
+  
+  constructor(
+    private appService: AppService,
 
-  constructor(private router: Router) { }
+    private ref: ChangeDetectorRef,
+    private router: Router,
+    private zone: NgZone
+  ) { }
 
   connect(username: string, hacModule:"HAS"|"KBE"): void {
-    this.loader = true;
+    const hacPwd = sessionStorage.getItem("hacPwd")
+    if(!hacPwd) throw new Error("No HAC password defined!")
+
+    this.loader   = true;
     this.username = username;
 
     hacUserAuth(
       username,
       { name: 'HACtutorial' },
-      this.pwd,
+      hacPwd,
       { key_type: 'active', value: 'MyCha11en6e' },
       hacModule === "KBE" ? "keychain" : "has"
     );
   }
 
   ngOnInit(): void {
-    /** Previous */
-    const username = localStorage.getItem("username")
-    if(username) this.username = username
-
-    if(username && this.pwd) this.hacAccount = hacGetAccounts(username, this.pwd)
-    if(this.hacAccount && this.hacAccount[0]) {
-      console.log('%cHAC Account', 'color: goldenrod', this.hacAccount[0].account)
-      this.connected = this.hacAccount[0].has ? "via token HAS" : "via Keychain"
-    }
-
     /** Subscription */
-    hacMsg.subscribe((m) => {
+    this.hacSubscription = hacMsg.subscribe((m) => {
+
       /** Received auth_wait => generate the qrCode */
       if (m.type === 'qr_code') {
         /** QRcode data */
@@ -56,26 +58,45 @@ export class SigninComponent implements OnInit, OnDestroy {
       /** Received authentication msg */
       if (m.type === 'authentication') {
         console.log('%cauthentication msg =>', 'color: goldenrod', m)
+
+        /** Authentication approved */
         if (m.msg?.status === "authentified") {
           this.loader = false;
           this.qrHAS = undefined;
-          localStorage.setItem('username', this.username!);
-          this.connected = m.msg?.data?.challenge.slice(0, 12) + '...';
-          this.router.navigate(['/operations'])
+
+          localStorage.setItem('current', this.username!);
+
+          /** emit username */
+          this.appService.emitUserLogin(this.username!);
+
+          /** Navigate to operations page (use ngZone because of Keychain) */
+          this.zone.run(()=> {
+            this.router.navigate(['/operations']);
+          });
+
+        /** Authentication rejected */
         } else if (m.msg?.status === "rejected") {
           this.loader = false;
           this.qrHAS = undefined;
           window.alert(`${ m.msg.data?.challenge }`);
+
+          /** Force update DOM for Keychain extension */
+          this.ref.detectChanges();
+
+        /** Authentication error */
         } else {
           this.loader = false;
           this.qrHAS = undefined;
           window.alert(`${ m.error?.msg }`);
+
+          /** Force update DOM for Keychain extension */
+          this.ref.detectChanges();
         }
       }
     });
   }
 
   ngOnDestroy(): void { 
-    // hacMsg.unsubscribe(); 
+    this.hacSubscription.unsubscribe(); 
   }
 }

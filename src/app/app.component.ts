@@ -1,7 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 
+/** Router */
+import { Router } from "@angular/router"
+
+/** FingerPrint */
+import FingerprintJS from '@fingerprintjs/fingerprintjs'
+
 /** Hive Authentication Client (HAC) */
 import { HiveAuthClient, hacGetAccounts } from '@mintrawa/hive-auth-client';
+
+import { AppService } from './app.service';
 
 @Component({
   selector: 'app-root',
@@ -9,23 +17,53 @@ import { HiveAuthClient, hacGetAccounts } from '@mintrawa/hive-auth-client';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  hasServer = ["wss://has.mintrawa.com", "wss://hive-auth.arcange.eu"]
+  hasServer = ["wss://has.mintrawa.com", "wss://hive-auth.arcange.eu"];
+
+  constructor(
+    private appService: AppService,
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
-    const pwd      = localStorage.getItem("pwd")
-    const username = localStorage.getItem("username")
+    /**
+     * Hive Authentication Client
+     * 
+     * Use fingerprint to generate the hac pwd for encryption
+     * store it in sessionStorage
+     * 
+     */
+    const fpPromise = FingerprintJS.load({ monitoring: false });
+    fpPromise
+    .then(fp => fp.get())
+    .then(result => {
+      sessionStorage.setItem("hacPwd", result.visitorId);
+      const current = localStorage.getItem('current');
+      
+      /** If returning */
+      if(current) {
+        let hacAccount = hacGetAccounts(current, result.visitorId);
+        /** We found the account in storage */
+        if(hacAccount[0]) {
+          console.log("|> HAC account <|", hacAccount[0]);
 
-    /** Check previous */
-    let hacAccount: ReturnType<typeof hacGetAccounts> = []
-    if(username && pwd) hacAccount = hacGetAccounts(username, pwd)
-    if(hacAccount[0]) {
-      console.log('%cHAC Account', 'color: goldenrod', hacAccount[0])
-      if(hacAccount[0].has) this.hasServer = [ hacAccount[0].has.has_server ]
-      /** Initialize the HIVE auth client */
-      HiveAuthClient(this.hasServer, { debug: true, delay: 200 }) 
-    } else {
-      /** Initialize the HIVE auth client */
-      HiveAuthClient(this.hasServer, { debug: true, delay: 200 })
-    }
+          /** emit username */
+          this.appService.emitUserLogin(current);
+          
+          /** Initialize the HIVE auth client */
+          HiveAuthClient(hacAccount[0].has ? [hacAccount[0].has.has_server] : undefined, { debug: true, delay: 500 });
+
+          /** Routing to operation page */
+          this.router.navigate(['/operations']);
+        } else {
+          /** Delete current */
+          localStorage.removeItem('current');
+          
+          /** Initialize the HIVE auth client */
+          HiveAuthClient(undefined, { debug: true, delay: 500 });
+        }
+      } else {
+        HiveAuthClient(undefined, { debug: true, delay: 500 });
+      }
+    }).catch(e => console.error(e));
   }
 }

@@ -1,0 +1,101 @@
+/* dark-theme.scss */
+@import '~@angular/material/theming';
+
+$my-color: (
+  50: #fefbea,
+  100: #fef7d6,
+  200: #fef3c2,
+  300: #feefae,
+  400: #feeb9a,
+  500: #fde785,
+  600: #fddf5d,
+  700: #e1ac28,
+  800: #322609,
+  900: #191304,
+  A100: #fefbea,
+  A200: #fef3c2,
+  A400: #feeb9a,
+  A700: #FDD835,
+  contrast: (
+    50: $black-87-opacity,
+    100: $black-87-opacity,
+    200: $black-87-opacity,
+    300: $black-87-opacity,
+    400: $black-87-opacity,
+    500: #fefbea,
+    600: #fefbea,
+    700: #fefbea,
+    800: #fefbea,
+    900: #fefbea,
+    A100: $black-87-opacity,
+    A200: $black-87-opacity,
+    A400: $black-87-opacity,
+    A700: #fefbea,
+  )
+);
+
+$light-primary: mat-palette($my-color, 700);
+$light-accent: mat-palette($my-color, 900);
+$light-active:  mat-palette($my-color, 700);
+
+/* The warn palette is optional (defaults to red). */
+$light-warn:    mat-palette($mat-red, 500);
+
+// custom background and foreground palettes
+$my-light-theme-background: (
+  status-bar: #e9eaea,
+  app-bar:    #e9eaea,                // For toolbar
+  background: #f4f4f4,
+  hover:      mat-color($my-color, 900, 0.1),
+  card:       #e9eaea,                // For MatMenu
+  dialog:     white,                  // For SideNav, MatDialog
+  disabled-button: $black-12-opacity,
+  raised-button: map-get($mat-grey, 800),
+  focused-button: $black-6-opacity,
+  selected-button: map-get($my-color, 700),
+  selected-disabled-button: map_get($mat-grey, 800),
+  disabled-button-toggle: white,
+  unselected-chip: #f1f2f2,
+  disabled-list-option: white,
+);
+
+$my-light-theme-foreground: (
+  base:              map-get($my-color, 900),
+  divider:           $black-12-opacity,
+  dividers:          $black-12-opacity,
+  disabled:          rgba(black, 0.3),
+  disabled-button:   rgba(black, 0.3),
+  disabled-text:     rgba(black, 0.3),
+  hint-text:         rgba(black, 0.3),
+  secondary-text:    rgba(black, 0.7),
+  icon:              black,
+  icons:             black,
+  text:              map-get($my-color, 900),
+  slider-min:        black,
+  slider-off:        rgba(black, 0.3),
+  slider-off-active: rgba(black, 0.3),
+);
+
+// instead of creating a theme with mat-light-theme like a sane person, we will create our own theme-creating function that lets us apply our own foreground and background palettes.
+@function create-light-theme($primary, $accent, $warn: mat-palette($mat-red)) {
+  @return (
+    primary: $primary,
+    accent: $accent,
+    warn: $warn,
+    is-dark: false,
+    foreground: $my-light-theme-foreground,
+    background: $my-light-theme-background
+  );
+}
+$light-theme: create-light-theme($light-primary, $light-accent, $light-warn);
+
+
+.light-theme {
+
+  @include angular-material-theme($light-theme); 
+
+  $primary:    map-get($light-theme, primary);
+  $accent:     map-get($light-theme, accent);
+  $warn:       map-get($light-theme, warn);
+
+}

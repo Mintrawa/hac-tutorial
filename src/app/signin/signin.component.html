@@ -1,20 +1,27 @@
-<div class="flex-container">
-
+<div class="container">
   <!-- SIGN IN -->
-  <div class="encart" *ngIf="!connected && !qrHAS">
-    <div>HIVE Username</div>
+  <div class="encart" *ngIf="!qrHAS">
+
+    <mat-form-field appearance="outline">
+      <mat-label>HIVE Username</mat-label>
+      <input #username matInput placeholder="HIVE Username">
+      <mat-icon matSuffix>https</mat-icon>
+      <mat-hint>your HIVE Username</mat-hint>
+    </mat-form-field>
+
+    <!-- <div>HIVE Username</div>
     <div style="height:6px;"></div>
-    <input #username type="text" />
+    <input #username type="text" /> -->
     <div style="height:6px;"></div>
     <div *ngIf="!loader">
-      <button (click)="connect(username.value, 'HAS')"> HAS Connect</button>&nbsp;
-      <button (click)="connect(username.value, 'KBE')"> KBE Connect</button>
+      <button mat-raised-button color="primary" (click)="connect(username.value, 'HAS')"> HAS Connect</button>&nbsp;
+      <button mat-raised-button color="primary" (click)="connect(username.value, 'KBE')"> KBE Connect</button>
     </div>
     <div *ngIf="loader" class="loader"></div>
   </div>
   
   <!-- QR Code -->
-  <div class="encart" *ngIf="!connected && qrHAS">
+  <div class="encart" *ngIf="qrHAS">
     <div>{{ username }}</div>
     <qr-code
       [value]="'has://auth_req/' + qrHAS"
@@ -23,14 +30,4 @@
     ></qr-code>
     <div *ngIf="loader" class="loader"></div>
   </div>
-
-  <!-- Routing -->
-  <div class="encart" *ngIf="connected">
-    <div><strong>{{ username }}</strong></div>
-    <div style="height:6px;"></div>
-    <div>Connected: {{ connected }}</div>
-    <div style="height:6px;"></div>
-    <button [routerLink]="['/operations']">>> OPERATIONS PAGE <<</button >
-  </div>
-
 </div>

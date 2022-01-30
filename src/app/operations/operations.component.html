@@ -1,3 +1,20 @@
+<mat-toolbar class="mat-elevation-z3" color="primary">
+  <button mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <span>HAC Operations</span>
+  <span class="example-spacer"></span>
+  <a href="javascript:void(0)" [matMenuTriggerFor]="menu" class="text-no-decoration menu-text-size">
+    <img *ngIf="!username" src="https://images.hive.blog/u/mintrawa.app/avatar" alt="Hive authentication client" class="app-profile-pic" style="vertical-align: middle;" />
+    <img *ngIf="username" [src]="'https://images.hive.blog/u/'+ username +'/avatar'" [alt]="username" class="app-profile-pic" style="vertical-align: middle;" />
+  </a>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item (click)="openDialog()">Switch account</button>
+    <button mat-menu-item (click)="logout(username ? username : 'undefined')">Logout</button>
+  </mat-menu>
+  <div style="width: 24px;"></div>
+</mat-toolbar>
+
 <div class="flex-container">
 
   <!-- USERNAME -->
