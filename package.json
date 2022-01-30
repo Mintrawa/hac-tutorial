@@ -4,7 +4,7 @@
   "description": "Use case example of the Hive Authentication Client (HAC) password less users authentication",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --port 8000 --host 0.0.0.0 --liveReload=true  --disable-host-check",
     "build": "ng build --configuration=production --base-href=/",
     "build-stat": "ng build --configuration=production --base-href=/ --stats-json",
     "watch": "ng build --watch --configuration development",
@@ -37,7 +37,7 @@
     "@angular/platform-browser": "~13.1.0",
     "@angular/platform-browser-dynamic": "~13.1.0",
     "@angular/router": "~13.1.0",
-    "@mintrawa/hive-auth-client": "^0.0.4",
+    "@mintrawa/hive-auth-client": "^0.0.6",
     "ng-qrcode": "^6.0.0",
     "rxjs": "~7.4.0",
     "tslib": "^2.3.0",

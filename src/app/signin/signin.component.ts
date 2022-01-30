@@ -60,12 +60,12 @@ export class SigninComponent implements OnInit, OnDestroy {
           this.loader = false;
           this.qrHAS = undefined;
           localStorage.setItem('username', this.username!);
-          this.connected = m.msg?.data?.chalenge.slice(0, 12) + '...';
+          this.connected = m.msg?.data?.challenge.slice(0, 12) + '...';
           this.router.navigate(['/operations'])
         } else if (m.msg?.status === "rejected") {
           this.loader = false;
           this.qrHAS = undefined;
-          window.alert(`${ m.msg.data?.chalenge }`);
+          window.alert(`${ m.msg.data?.challenge }`);
         } else {
           this.loader = false;
           this.qrHAS = undefined;
