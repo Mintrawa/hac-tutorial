@@ -5,6 +5,7 @@ import { Router } from "@angular/router"
 
 /** HIVE auth client */
 import { hacMsg, hacUserAuth } from '@mintrawa/hive-auth-client';
+// import { hacMsg, hacUserAuth } from '../../assets/lib';
 
 import { AppService } from '../app.service';
 
@@ -20,6 +21,10 @@ export class SigninComponent implements OnInit, OnDestroy {
 
   loader = false;
   qrHAS: string | undefined;
+
+  hasLoader = false;
+  hasExpireDelay = 100;
+  hasExpireDelayInterval!: ReturnType<typeof setInterval>;
   
   constructor(
     private appService: AppService,
@@ -30,8 +35,8 @@ export class SigninComponent implements OnInit, OnDestroy {
   ) { }
 
   connect(username: string, hacModule:"HAS"|"KBE"): void {
-    const hacPwd = sessionStorage.getItem("hacPwd")
-    if(!hacPwd) throw new Error("No HAC password defined!")
+    const hacPwd = sessionStorage.getItem("hacPwd");
+    if(!hacPwd) throw new Error("No HAC password defined!");
 
     this.loader   = true;
     this.username = username;
@@ -53,11 +58,28 @@ export class SigninComponent implements OnInit, OnDestroy {
       if (m.type === 'qr_code') {
         /** QRcode data */
         this.qrHAS = (m as any).msg;
+
+        /** expire Delay Timer */
+        this.hasLoader = true;
+        this.hasExpireDelayInterval = setInterval(() => {
+          this.hasExpireDelay -= 1;
+          if(this.hasExpireDelay === 0) {
+            clearInterval(this.hasExpireDelayInterval);
+            
+            this.qrHAS = undefined;
+            this.loader = false;
+            this.hasLoader = false;
+            this.hasExpireDelay = 100;
+          }
+        }, 1000);
       }
 
       /** Received authentication msg */
       if (m.type === 'authentication') {
-        console.log('%cauthentication msg =>', 'color: goldenrod', m)
+        console.log('%c|> HAC authentication msg |>', 'color: goldenrod', m);
+
+        this.hasLoader = false;
+        this.hasExpireDelay = 100;
 
         /** Authentication approved */
         if (m.msg?.status === "authentified") {

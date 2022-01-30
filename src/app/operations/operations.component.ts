@@ -13,6 +13,11 @@ import {
   hacFollowing, hacManualTransaction, hacVote, hacWitnessVote, 
   hacTransfer, hacTransferToVesting, hacWithdrawVesting, hacDelegation, hacConvert
 } from '@mintrawa/hive-auth-client';
+// import { 
+//   hacMsg, hasGetConnectionStatus, hacGetAccounts,
+//   hacFollowing, hacManualTransaction, hacVote, hacWitnessVote, 
+//   hacTransfer, hacTransferToVesting, hacWithdrawVesting, hacDelegation, hacConvert
+// } from '../../assets/lib';
 
 export interface DialogData {
   username?: string;
@@ -22,6 +27,7 @@ export interface DialogData {
 import { AppService } from '../app.service';
 import { Subscription } from 'rxjs';
 
+/** Account switcher */
 @Component({
   selector: 'operation-dialog',
   templateUrl: 'operation-dialog.component.html',
@@ -38,7 +44,7 @@ export class DialogOperationsDialog {
   }
 
   onNoClick(): void {
-    this.dialogRef.close();
+    this.dialogRef.close('NEW');
   }
 }
 
@@ -59,6 +65,10 @@ export class OperationsComponent implements OnInit, OnDestroy {
   total_vesting_shares:number = 0
 
   opeLoader: string = "none"
+  opeLoaderHas: string = "none"
+
+  hasExpireDelay = 100;
+  hasExpireDelayInterval!: ReturnType<typeof setInterval>;
 
   constructor(
     private appService: AppService,
@@ -70,6 +80,7 @@ export class OperationsComponent implements OnInit, OnDestroy {
     private zone: NgZone
   ) {}
 
+  /** Open the Account switcher */
   openDialog(): void {
     const data: DialogData = {
       username: this.username,
@@ -78,16 +89,28 @@ export class OperationsComponent implements OnInit, OnDestroy {
 
     const dialogRef = this.dialog.open(DialogOperationsDialog, { width: '250px', data });
 
-    dialogRef.afterClosed().subscribe((result: ReturnType <typeof hacGetAccounts>|undefined) => {
+    /** Result of Account switcher */
+    dialogRef.afterClosed().subscribe((result: ReturnType <typeof hacGetAccounts>|"NEW"|undefined) => {
+      /** Choose to switch to an account */
       if(result) {
-        localStorage.setItem("current", result[0].account)
-        this.username = result[0].account;
-        this.appService.emitUserLogin(this.username);
-      } else {
-        localStorage.removeItem("current")
-        this.username = undefined;
-        this.appService.emitUserLogin(this.username);
-        this.router.navigate(['/']);
+        /** Click on New */  
+        if(result === "NEW") {
+          localStorage.removeItem("current")
+          this.username = undefined;
+          this.appService.emitUserLogin(this.username);
+          this.router.navigate(['/']);
+
+        /** Switch account */  
+        } else {
+          const hacPwd = sessionStorage.getItem("hacPwd");
+          if(!hacPwd) throw new Error("No HAC password defined!");
+          const a = hacGetAccounts(result[0].account, hacPwd);
+          if(!a) throw new Error("user not found!");
+  
+          localStorage.setItem("current", result[0].account)
+          this.username = result[0].account;
+          this.appService.emitUserLogin(this.username);
+        }
       }
     });
   }
@@ -154,12 +177,13 @@ export class OperationsComponent implements OnInit, OnDestroy {
   }
 
   delegation(delegatee: string, HIVE: string): void {
-    this.opeLoader = 'delegation'
-    const VESTS = this.convertPOWERtoVEST(parseInt(HIVE))
-    hacDelegation(delegatee, VESTS+' VESTS')
+    this.opeLoader = 'delegation';
+    const VESTS = this.convertPOWERtoVEST(parseInt(HIVE));
+    hacDelegation(delegatee, VESTS+' VESTS');
   }
 
   logout(u: string): void {
+    this.username = undefined;
     this.appService.emitUserLogout(u);
 
     /** Navigate to operations page (use ngZone because of Keychain) */
@@ -169,6 +193,7 @@ export class OperationsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    /** Previous connexion */
     if(!this.appService.username) {
       const current = localStorage.getItem("current");
       if(current) {
@@ -177,35 +202,55 @@ export class OperationsComponent implements OnInit, OnDestroy {
       } else {
         this.router.navigate(['/']);
       }
+    } else {
+      this.username = this.appService.username;
     }
 
+    /** Received user update */
     this.userSubscription = this.appService.userSubject.subscribe(user => { 
       this.username = user; 
-      console.log("userSubject", user);
+      console.log("|> HAC subject |>", user);
     });
 
+    /** HAC Subscription */
     this.hacSubscription = hacMsg.subscribe(m => {
       /** HAC => Received sign_wait */
       if(m.type === "sign_wait") {
-        console.log('%cReceived sign_wait =>', 'color: goldenrod', m.msg? m.msg.uuid : null)
+        console.log('%c|> HAC Sign wait |>', 'color: goldenrod', m.msg? m.msg.uuid : null);
+
+        /** expire Delay Timer */
+        this.opeLoaderHas = this.opeLoader;
+
+        this.hasExpireDelayInterval = setInterval(() => {
+          this.hasExpireDelay -= 1;
+          if(this.hasExpireDelay === 0) {
+            clearInterval(this.hasExpireDelayInterval);
+            
+            this.opeLoader = 'none';
+            this.opeLoaderHas = 'none';
+            this.hasExpireDelay = 100;
+          }
+        }, 1000);
       }
 
       /** HAC => Received sign_result */
       if(m.type === "tx_result") {
-        this.opeLoader = 'none'
+        this.opeLoader = 'none';
+        this.opeLoaderHas = 'none';
+        this.hasExpireDelay = 100;
 
-        console.log('%cReceived sign_result =>', 'color: goldenrod', m.msg? m.msg : null)
-        const data: any = m.msg?.data
-        const txt = data && typeof(data) === "string" ? " | " + data : data && data.id ? " | " + data.id : ""
-        const al = `${ m.msg?.status } | ${ m.msg?.uuid ? m.msg?.uuid : "" } ${ txt }`
-        window.alert(al)
-        this.trx = m.msg?.status
-        this.ref.detectChanges()
+        console.log('%c|> HAC Sign result |>', 'color: goldenrod', m.msg? m.msg : null);
+        const data: any = m.msg?.data;
+        const txt = data && typeof(data) === "string" ? " | " + data : data && data.id ? " | " + data.id : "";
+        const al = `${ m.msg?.status } | ${ m.msg?.uuid ? m.msg?.uuid : "" } ${ txt }`;
+        window.alert(al);
+        this.trx = m.msg?.status;
+        this.ref.detectChanges();
       }
     })
 
     this.http.post("https://api.openhive.network", { "jsonrpc":"2.0", "method": "condenser_api.get_dynamic_global_properties", "params": [], "id":1 }, { "headers": { "Content-Type":  "application/json" }}).subscribe((data:any) => {
-      console.log(" DATA => ", data)
+      console.log("|> Hive Get properties |>", data)
       if(data && data.result) {
         this.total_vesting_fund_hive = data.result.total_vesting_fund_hive.replace(' HIVE','')
         this.total_vesting_shares    = data.result.total_vesting_shares.replace(' VESTS','')
@@ -213,7 +258,7 @@ export class OperationsComponent implements OnInit, OnDestroy {
     })
 
     setTimeout(() => {
-      console.log('%cHAS Status', 'color: goldenrod', hasGetConnectionStatus())
+      console.log('%c|> HAC status |>', 'color: goldenrod', hasGetConnectionStatus())
     }, 3000);
   }
 

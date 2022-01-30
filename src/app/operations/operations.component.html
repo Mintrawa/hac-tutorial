@@ -34,8 +34,12 @@
   <div class="encart item">
     <div><strong>CLAIM ACCOUNT</strong></div>
     <div style="height:6px;"></div>
-    <button *ngIf="opeLoader !== 'manualTransaction'" [disabled]="opeLoader !== 'none'" (click)="manualTransaction()">CLAIM ACCOUNT (manual transaction)</button>
+    <button mat-raised-button color="primary" *ngIf="opeLoader !== 'manualTransaction'" [disabled]="opeLoader !== 'none'" (click)="manualTransaction()">CLAIM ACCOUNT (manual transaction)</button>
     <div *ngIf="opeLoader === 'manualTransaction'" class="loader"></div>
+    <div *ngIf="opeLoaderHas === 'manualTransaction'" style="font-size: xx-small;padding: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center">
+      <mat-progress-bar style="width: 150px;" mode="determinate" [value]="hasExpireDelay + 0.5"></mat-progress-bar>
+      <div>Request expire in <span class="text-primary">{{ hasExpireDelay }}</span> sec</div>
+    </div>
   </div>
 
   <div style="height: 20px;"></div>
@@ -44,13 +48,23 @@
   <div class="encart item">
     <div><strong>FOLLOWING</strong></div>
     <div style="height:6px;"></div>
-    <div><input #following type="text"></div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>HIVE Username</mat-label>
+      <input #following matInput placeholder="HIVE Username">
+    </mat-form-field>
+
     <div style="height:6px;"></div>
     <div *ngIf="opeLoader !== 'follow'">
-      <button  [disabled]="opeLoader !== 'none'" (click)="follow(following.value, true)">FOLLOW</button>&nbsp;
-      <button  [disabled]="opeLoader !== 'none'" (click)="follow(following.value, false)">UNFOLLOW</button>
+      <button mat-raised-button color="primary" [disabled]="opeLoader !== 'none'" (click)="follow(following.value, true)">FOLLOW</button>&nbsp;
+      <button mat-raised-button color="primary" [disabled]="opeLoader !== 'none'" (click)="follow(following.value, false)">UNFOLLOW</button>
     </div>
     <div *ngIf="opeLoader === 'follow'" class="loader"></div>
+    <div *ngIf="opeLoaderHas === 'follow'" style="font-size: xx-small;padding: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center">
+      <mat-progress-bar style="width: 150px;" mode="determinate" [value]="hasExpireDelay + 0.5"></mat-progress-bar>
+      <div>Request expire in <span class="text-primary">{{ hasExpireDelay }}</span> sec</div>
+    </div>
+
   </div>
 
   <div style="height: 20px;"></div>
@@ -68,10 +82,14 @@
     </div>
     <div style="height:6px;"></div>
     <div *ngIf="opeLoader !== 'vote'">
-      <button  [disabled]="opeLoader !== 'none'" (click)="vote(author.value, permlink.value, weight.value, false)">VOTE</button>&nbsp;
-      <button  [disabled]="opeLoader !== 'none'" (click)="vote(author.value, permlink.value, weight.value, true)">DONVOTE</button>
+      <button mat-raised-button color="primary" [disabled]="opeLoader !== 'none'" (click)="vote(author.value, permlink.value, weight.value, false)">VOTE</button>&nbsp;
+      <button mat-raised-button color="primary" [disabled]="opeLoader !== 'none'" (click)="vote(author.value, permlink.value, weight.value, true)">DONVOTE</button>
     </div>
     <div *ngIf="opeLoader === 'vote'" class="loader"></div>
+    <div *ngIf="opeLoaderHas === 'vote'" style="font-size: xx-small;padding: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center">
+      <mat-progress-bar style="width: 150px;" mode="determinate" [value]="hasExpireDelay + 0.5"></mat-progress-bar>
+      <div>Request expire in <span class="text-primary">{{ hasExpireDelay }}</span> sec</div>
+    </div>
   </div>
 
   <div style="height: 20px;"></div>
@@ -80,13 +98,20 @@
   <div class="encart item">
     <div><strong>VOTE WITNESS</strong></div>
     <div style="height:6px;"></div>
-    <div>witness: <input #witness type="text" value="mintrawa"></div>
+    <mat-form-field appearance="outline">
+      <mat-label>HIVE witness</mat-label>
+      <input #witness matInput placeholder="HIVE witness" value="mintrawa">
+    </mat-form-field>
     <div style="height:6px;"></div>
     <div *ngIf="opeLoader !== 'voteWitness'">
-      <button  [disabled]="opeLoader !== 'none'" (click)="voteWitness(witness.value, true)">APPROVE</button>&nbsp;
-      <button  [disabled]="opeLoader !== 'none'" (click)="voteWitness(witness.value, false)">DISAPPROVE</button>
+      <button mat-raised-button color="primary" [disabled]="opeLoader !== 'none'" (click)="voteWitness(witness.value, true)">APPROVE</button>&nbsp;
+      <button mat-raised-button color="primary" [disabled]="opeLoader !== 'none'" (click)="voteWitness(witness.value, false)">DISAPPROVE</button>
     </div>
     <div *ngIf="opeLoader === 'voteWitness'" class="loader"></div>
+    <div *ngIf="opeLoaderHas === 'voteWitness'" style="font-size: xx-small;padding: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center">
+      <mat-progress-bar style="width: 150px;" mode="determinate" [value]="hasExpireDelay + 0.5"></mat-progress-bar>
+      <div>Request expire in <span class="text-primary">{{ hasExpireDelay }}</span> sec</div>
+    </div>
   </div>
 
   <div style="height: 20px;"></div>
@@ -104,9 +129,13 @@
     </div>
     <div style="height:6px;"></div>
     <div *ngIf="opeLoader !== 'transfer'">
-      <button  [disabled]="opeLoader !== 'none'" (click)="transfer(to.value, amountTransfer.value, currencyTransfer.value, memo.value)">TRANSFER</button>
+      <button mat-raised-button color="primary" [disabled]="opeLoader !== 'none'" (click)="transfer(to.value, amountTransfer.value, currencyTransfer.value, memo.value)">TRANSFER</button>
     </div>
     <div *ngIf="opeLoader === 'transfer'" class="loader"></div>
+    <div *ngIf="opeLoaderHas === 'transfer'" style="font-size: xx-small;padding: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center">
+      <mat-progress-bar style="width: 150px;" mode="determinate" [value]="hasExpireDelay + 0.5"></mat-progress-bar>
+      <div>Request expire in <span class="text-primary">{{ hasExpireDelay }}</span> sec</div>
+    </div>
   </div>
 
   <div style="height: 20px;"></div>
@@ -122,9 +151,13 @@
     </div>
     <div style="height:6px;"></div>
     <div *ngIf="opeLoader !== 'transferToVesting'">
-      <button  [disabled]="opeLoader !== 'none'" (click)="transferToVesting(powerTo.value, powerValue.value)">POWER UP</button>
+      <button mat-raised-button color="primary" [disabled]="opeLoader !== 'none'" (click)="transferToVesting(powerTo.value, powerValue.value)">POWER UP</button>
     </div>
     <div *ngIf="opeLoader === 'transferToVesting'" class="loader"></div>
+    <div *ngIf="opeLoaderHas === 'transferToVesting'" style="font-size: xx-small;padding: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center">
+      <mat-progress-bar style="width: 150px;" mode="determinate" [value]="hasExpireDelay + 0.5"></mat-progress-bar>
+      <div>Request expire in <span class="text-primary">{{ hasExpireDelay }}</span> sec</div>
+    </div>
   </div>
 
   <div style="height: 20px;"></div>
@@ -138,9 +171,13 @@
     </div>
     <div style="height:6px;"></div>
     <div *ngIf="opeLoader !== 'withdrawVesting'">
-      <button  [disabled]="opeLoader !== 'none'" (click)="withdrawVesting(powerdownValue.value)">POWER DOWN</button>
+      <button mat-raised-button color="primary" [disabled]="opeLoader !== 'none'" (click)="withdrawVesting(powerdownValue.value)">POWER DOWN</button>
     </div>
     <div *ngIf="opeLoader === 'withdrawVesting'" class="loader"></div>
+    <div *ngIf="opeLoaderHas === 'withdrawVesting'" style="font-size: xx-small;padding: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center">
+      <mat-progress-bar style="width: 150px;" mode="determinate" [value]="hasExpireDelay + 0.5"></mat-progress-bar>
+      <div>Request expire in <span class="text-primary">{{ hasExpireDelay }}</span> sec</div>
+    </div>
   </div>
 
   <div style="height: 20px;"></div>
@@ -154,9 +191,13 @@
     </div>
     <div style="height:6px;"></div>
     <div *ngIf="opeLoader !== 'convert'">
-      <button  [disabled]="opeLoader !== 'none'" (click)="convert(amountConvert.value, currencyConvert.value)">CONVERT</button>
+      <button mat-raised-button color="primary" [disabled]="opeLoader !== 'none'" (click)="convert(amountConvert.value, currencyConvert.value)">CONVERT</button>
     </div>
     <div *ngIf="opeLoader === 'convert'" class="loader"></div>
+    <div *ngIf="opeLoaderHas === 'convert'" style="font-size: xx-small;padding: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center">
+      <mat-progress-bar style="width: 150px;" mode="determinate" [value]="hasExpireDelay + 0.5"></mat-progress-bar>
+      <div>Request expire in <span class="text-primary">{{ hasExpireDelay }}</span> sec</div>
+    </div>
   </div>
 
   <div style="height: 20px;"></div>
@@ -172,9 +213,13 @@
     </div>
     <div style="height:6px;"></div>
     <div *ngIf="opeLoader !== 'delegation'">
-      <button  [disabled]="opeLoader !== 'none'" (click)="delegation(delegatee.value, delegate.value)">DELEGATE</button>
+      <button mat-raised-button color="primary" [disabled]="opeLoader !== 'none'" (click)="delegation(delegatee.value, delegate.value)">DELEGATE</button>
     </div>
     <div *ngIf="opeLoader === 'delegation'" class="loader"></div>
+    <div *ngIf="opeLoaderHas === 'delegation'" style="font-size: xx-small;padding: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center">
+      <mat-progress-bar style="width: 150px;" mode="determinate" [value]="hasExpireDelay + 0.5"></mat-progress-bar>
+      <div>Request expire in <span class="text-primary">{{ hasExpireDelay }}</span> sec</div>
+    </div>
   </div>
 
   <div style="height: 20px;"></div>

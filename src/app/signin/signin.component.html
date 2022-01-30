@@ -29,5 +29,9 @@
       [errorCorrectionLevel]="'M'"
     ></qr-code>
     <div *ngIf="loader" class="loader"></div>
+    <div *ngIf="hasLoader" style="font-size: xx-small;padding: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center">
+      <mat-progress-bar style="width: 150px;" mode="determinate" [value]="hasExpireDelay + 0.5"></mat-progress-bar>
+      <div>Request expire in <span class="text-primary">{{ hasExpireDelay }}</span> sec</div>
+    </div>
   </div>
 </div>

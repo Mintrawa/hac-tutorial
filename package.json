@@ -40,7 +40,7 @@
     "@angular/platform-browser-dynamic": "~13.2.0",
     "@angular/router": "~13.2.0",
     "@fingerprintjs/fingerprintjs": "^3.3.2",
-    "@mintrawa/hive-auth-client": "^0.0.6",
+    "@mintrawa/hive-auth-client": "^0.0.8",
     "ng-qrcode": "^6.0.0",
     "rxjs": "~7.4.0",
     "tslib": "^2.3.0",

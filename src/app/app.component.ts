@@ -8,6 +8,7 @@ import FingerprintJS from '@fingerprintjs/fingerprintjs'
 
 /** Hive Authentication Client (HAC) */
 import { HiveAuthClient, hacGetAccounts } from '@mintrawa/hive-auth-client';
+// import { HiveAuthClient, hacGetAccounts } from '../assets/lib';
 
 import { AppService } from './app.service';
 
@@ -44,7 +45,11 @@ export class AppComponent implements OnInit {
         let hacAccount = hacGetAccounts(current, result.visitorId);
         /** We found the account in storage */
         if(hacAccount[0]) {
-          console.log("|> HAC account <|", hacAccount[0]);
+          console.log("|> HAC account |>", hacAccount[0]);
+
+          const has_expire = hacAccount[0].has?.has_expire
+          const expire = has_expire ? new Date(has_expire) : 1;
+          console.log("|> expire |>", expire);
 
           /** emit username */
           this.appService.emitUserLogin(current);
